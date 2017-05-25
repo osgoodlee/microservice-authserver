@@ -1,0 +1,17 @@
+server:
+  port: 8888
+security:
+  oauth2:
+    client:
+      client-id: my-trusted-client
+      client-secret: 123456
+      access-token-uri: http://localhost:9999/uaa/oauth/token
+      user-authorization-uri: http://localhost:9999/uaa/oauth/authorize
+    resource:
+        user-info-uri: http://localhost:9999/uaa/user
+#       user-info-uri: http://localhost:8080/user
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
