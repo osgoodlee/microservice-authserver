@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: auth-service
+  thymeleaf:
+    cache: false
+  datasource:
+#     url: jdbc:mysql://192.168.1.58:3306/cloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
+#     username:  root
+#     password:  P@ssword123
+    url: jdbc:mysql://120.76.200.75:3306/cloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username:  root
+    password:  lisi
+    driver-class-name:  com.mysql.jdbc.Driver
+    
+management:
+  context_path: /admin
+  
+security:
+  oauth2:
+      resource:
+        filter-order: 3
+#         userInfoUri: http://localhost:9999/uaa/user
+#     client:
+#         clientId: acme
+#         clientSecret: acmesecret
+#         authorized-grant-types: authorization_code,refresh_token,password
+# #         scope: openid
+#         scope: read,write
+#         auto-approve-scopes: '.*'
+        
+mybatis:
+    mapperLocations:  classpath:mybatis/mapper/mysql/*.xml
+    typeAliasesPackage: framework.lisi.entity
+    configLocation: classpath:mybatis/mybatis-config.xml
+server:
+  port: 9999
+  contextPath: /uaa
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
