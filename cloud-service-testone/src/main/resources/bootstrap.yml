@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      name: ribbon-consumer
+      profile: eschool
+      label: trunk
+      uri: http://localhost:8888

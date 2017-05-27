@@ -43,7 +43,7 @@ public class CustomUserService implements UserDetailsService {
 		if (user == null) {
 			throw new UsernameNotFoundException("用户名不存在");
 		}
-		System.out.println("username:" + user.getUsername() + ";password:" + user.getPassword());
+		System.out.println("username:" + user.getLoginName() + ";password:" + user.getPassword());
 		user.setUsername(user.getLoginName());
 		// return user;
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), true, // 是否可用

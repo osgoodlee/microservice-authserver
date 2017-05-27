@@ -15,9 +15,13 @@
  */
 package com.example;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +33,7 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 
@@ -41,35 +46,45 @@ import java.security.Principal;
  *
  */
 @EnableAutoConfiguration
+@EnableDiscoveryClient
 @Configuration
 @EnableOAuth2Sso
 @RestController
 public class ClientApplication extends  WebSecurityConfigurerAdapter {
 	
+	@Value("${oauth.authorize:http://localhost:9999/oauth/authorize}")
+	private String authorizeUrl;
+
+	@Value("${oauth.token:http://localhost:9999/oauth/token}")
+	private String tokenUrl;
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/client").hasRole("USER").anyRequest().authenticated();
-		;
 	}
+	
+	@Autowired
+	private OAuth2RestOperations restTemplate;
 	
 	@RequestMapping("/client")
 	public String home(Principal user) {
-		return "Hello " + user.getName();
+		return restTemplate.getForObject("http://TESTONE-SERVICE/add?a=10&b=20", String.class).toString();
 	}
 	
-//	@Bean
-//	public OAuth2RestOperations restTemplate(OAuth2ClientContext oauth2ClientContext) {
-//		return new OAuth2RestTemplate(resource(), oauth2ClientContext);
-//	}
-//
-//	@Bean
-//	protected OAuth2ProtectedResourceDetails resource() {
-//		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
-//		resource.setAccessTokenUri(tokenUrl);
-//		resource.setUserAuthorizationUri(authorizeUrl);
-//		resource.setClientId("my-trusted-client");
-//		return resource ;
-//	}
+	@Bean
+	@LoadBalanced
+	public OAuth2RestOperations restTemplate(OAuth2ClientContext oauth2ClientContext) {
+		return new OAuth2RestTemplate(resource(), oauth2ClientContext);
+	}
+
+	@Bean
+	protected OAuth2ProtectedResourceDetails resource() {
+		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
+		resource.setAccessTokenUri(tokenUrl);
+		resource.setUserAuthorizationUri(authorizeUrl);
+		resource.setClientId("my-trusted-client");
+		return resource ;
+	}
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(ClientApplication.class).run(args);

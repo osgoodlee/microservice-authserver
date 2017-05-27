@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-service
+    name: testone-service
   thymeleaf:
     cache: false
   datasource:
@@ -8,23 +8,21 @@ spring:
     username:  root
     password:  P@ssword123
     driver-class-name:  com.mysql.jdbc.Driver
-    
-management:
-  context_path: /admin
-  
-security:
-  oauth2:
-      resource:
-        filter-order: 3
-        userInfoUri: http://localhost:9999/uaa/user
-        
 mybatis:
     mapperLocations:  classpath:mybatis/mapper/mysql/*.xml
     typeAliasesPackage: framework.lisi.entity
     configLocation: classpath:mybatis/mybatis-config.xml
+security:
+    oauth2:
+        client:
+          client-id: my-trusted-client
+          client-secret: 123456
+          access-token-uri: http://localhost:9999/uaa/oauth/token
+          user-authorization-uri: http://localhost:9999/uaa/oauth/authorize
+        resource:
+            userInfoUri:  http://localhost:9999/uaa/user
 server:
-  port: 9999
-  contextPath: /uaa
+  port: 3333
 eureka:
   client:
     serviceUrl:
