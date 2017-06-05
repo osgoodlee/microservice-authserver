@@ -1,0 +1,11 @@
+server:
+  port: 8888
+
+spring:
+  profiles:
+    active: subversion
+  cloud:
+    config:
+      server:
+        svn:
+          uri: https://192.168.1.251/svn/%E5%B9%BF%E4%B8%9C%E7%9C%81%E7%94%B5%E5%AD%90%E5%95%86%E5%8A%A1%E6%8A%80%E5%B8%88%E5%AD%A6%E9%99%A2/cloud-config
