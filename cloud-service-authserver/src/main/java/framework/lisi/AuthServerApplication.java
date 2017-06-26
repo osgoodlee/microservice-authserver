@@ -61,7 +61,7 @@ public class AuthServerApplication {
 
 	@RequestMapping("/user")
 	public Principal user(Principal user) {
-		System.out.println("登录用户：" + user.getName());
+//		System.out.println("登录用户：" + user.getName());
 		return user;
 	}
 	
