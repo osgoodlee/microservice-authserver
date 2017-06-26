@@ -30,4 +30,8 @@ public class TestController {
 		return r;
 	}
 
+	@RequestMapping(value = "/hello", method = RequestMethod.GET)
+	public String hello() {
+		return "hello";
+	}
 }
