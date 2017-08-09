@@ -23,7 +23,6 @@ security:
       resource:
         filter-order: 3
         userInfoUri: http://localhost:9999/uaa/user
-spring:
 
 mybatis:
     mapperLocations:  classpath:mybatis/mapper/mysql/*.xml
