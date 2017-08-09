@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -61,7 +62,7 @@ public class AuthServerApplication {
 
 	@RequestMapping("/user")
 	public Principal user(Principal user) {
-//		System.out.println("登录用户：" + user.getName());
+		System.out.println("登录用户：" + user.getName());
 		return user;
 	}
 	
@@ -70,33 +71,20 @@ public class AuthServerApplication {
 	protected static class LoginConfig extends WebSecurityConfigurerAdapter {
 
 		@Autowired
-		private DataSource dataSource;
-		
-		@Autowired
 		private AuthenticationManager authenticationManager;
-		
-		@Autowired
-		private BCryptPasswordEncoder passwordEncoder;
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			// @formatter:off
-			http.formLogin().loginPage("/login").permitAll().and()
-					.requestMatchers().antMatchers("/login","/oauth/authorize", "/oauth/confirm_access").and()
-//					.requestMatchers().antMatchers("/**").and()
-//					.authorizeRequests().antMatchers("/login", "/index", "/oauth/authorize", "/oauth/confirm_access").permitAll().and()
-					.authorizeRequests().anyRequest().authenticated()
-//					.and().sessionManagement()
-//                    .maximumSessions(2).maxSessionsPreventsLogin(true)
-//                    .expiredUrl("/index")
-					;
+			http.formLogin().loginPage("/login").permitAll().and().requestMatchers()
+					.antMatchers("/login", "/index", "/oauth/authorize", "/oauth/confirm_access").and()
+					.authorizeRequests().anyRequest().authenticated();
 			// @formatter:on
 		}
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.parentAuthenticationManager(authenticationManager);
-			auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder);
 		}
 	}
 
@@ -104,10 +92,17 @@ public class AuthServerApplication {
 	@EnableResourceServer
 	protected static class ResourceServer extends ResourceServerConfigurerAdapter {
 
+		@Autowired
+		private TokenStore tokenStore;
+
+		@Override
+		public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+			resources.tokenStore(tokenStore);
+		}
+		
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-//			http.authorizeRequests().antMatchers("/*.jpg").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
-			http.authorizeRequests().anyRequest().authenticated();
+			http.authorizeRequests().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
 		}
 	}
 	
@@ -122,8 +117,7 @@ public class AuthServerApplication {
 		@Autowired
 		private DataSource dataSource;
 
-		@Autowired
-		private BCryptPasswordEncoder passwordEncoder;
+		private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 		@Autowired
 		private TokenStore tokenStore;
@@ -153,4 +147,11 @@ public class AuthServerApplication {
 		}
 
 	}
+
+//	// @Autowired
+//	public void init(AuthenticationManagerBuilder auth) throws Exception {
+//		// @formatter:off
+//		auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder());
+//		// @formatter:on
+//	}
 }
