@@ -1,25 +1,171 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Spring Security Example</title>
+<meta http-equiv="Content-Type" contents="text/html; charset=UTF-8" />
+<title>登录</title>
+<link rel="shortcut icon" th:href="@{/res/images/favicon.ico}" sizes="32x32" />
+<link th:href="@{/res/bootstrap/3.3.6/css/bootstrap.min.css}"
+	type="text/css" rel="stylesheet" />
+<link
+	th:href="@{/res/bootstrap/3.3.6/css_hplus/css/font-awesome.min.css?v=4.4.0}"
+	rel="stylesheet" />
+<link th:href="@{/res/bootstrap/3.3.6/css_hplus/css/animate.min.css}"
+	rel="stylesheet" />
+<link
+	th:href="@{/res/bootstrap/3.3.6/css_hplus/css/style.min862f.css?v=4.1.0}"
+	rel="stylesheet" />
+<link
+	th:href="@{/res/bootstrap/3.3.6/css_hplus/css/plugins/toastr/toastr.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/res/login/css/login.css}" rel="stylesheet" type="text/css" />
+<script th:src="@{/res/jquery/jquery-1.9.1.min.js}" type="text/javascript"></script>
+<script th:src="@{/res/bootstrap/3.3.6/js/bootstrap.min.js}"
+	type="text/javascript"></script>
+<script
+	th:src="@{/res/bootstrap/3.3.6/css_hplus/js/plugins/toastr/toastr.min.js}"></script>
+<script th:inline="JavaScript">
+	var toastr;
+	toastr.options = {
+		"closeButton" : true,
+		"debug" : false,
+		"progressBar" : true,
+		"positionClass" : "toast-top-center",
+		"onclick" : null,
+		"showDuration" : "400",
+		"hideDuration" : "1000",
+		"timeOut" : "2000",
+		"extendedTimeOut" : "1000",
+		"showEasing" : "swing",
+		"hideEasing" : "linear",
+		"showMethod" : "fadeIn",
+		"hideMethod" : "fadeOut",
+		"preventDuplicates" : true
+	}
+// 	$(document).ready(function() {
+// 		var msg = '${message}';
+// 		if (msg != '') {
+// 			toastr.error(msg);
+// 		}
+// 	});
+
+	function form_sub() {
+		var username = $('#username');
+		var password = $('#password');
+		var validateCode = $('#validateCode');
+		if (username.val() == '') {
+			toastr.warning("请填写用户名！");
+			username.focus();
+			return false;
+		}
+		if (password.val() == '') {
+			toastr.warning("请填写密码！");
+			password.focus();
+			return false;
+		}
+		if (validateCode.val() == '') {
+			toastr.warning("请填写验证码！");
+			validateCode.focus();
+			return false;
+		}
+
+		if (hasSpecialString(password.val())
+				|| hasSpecialString(username.val())) {
+			toastr.warning("输入包含非法字符！");
+			return false;
+		}
+
+		var newPassword = compileStr(password.val());
+		$('#password').val(newPassword);
+
+		$.ajax({
+					url : "${pageContext.request.contextPath}/servlet/validateCodeServlet?rand="
+							+ Math.random(),
+					type : 'get',
+					dataType : 'text',
+					data : {
+						validateCode : validateCode.val()
+					},
+					success : function(res) {
+						if (res == 'true') {
+							$('#loginSub').click();
+						} else {
+							toastr.error("验证码错误！");
+							validateCode.focus();
+						}
+					}
+				});
+	}
+		$(document).ready(function() {
+			//文本框聚焦事件
+		    $("input[type='text']").focus(function(){
+		        if($(this).val() == this.defaultValue){
+		            $(this).val("").css("color","#333");
+		        }
+		        $(this).parent().css({borderColor:"#189acb"});
+		    }).blur(function(){
+		        if($(this).val() == ""){
+		            $(this).val(this.defaultValue).css("color","#afafaf");
+		        }
+		        $(this).parent().css({borderColor:"#d1d1d1"});
+		    });
+			});	
+</script>
 </head>
+
 <body>
-	<div th:if="${param.error}">用户名或密码错</div>
-	<div th:if="${param.logout}">您已注销成功</div>
-	<form th:action="@{/login}" method="post">
-		<div>
-			<label> 用户名 : <input type="text" name="username" />
-			</label>
+	<div class="top">
+		<div class="l-width">
+			<h1 class="h-title">
+				<img th:src="@{/res/login/images/logox64.png}" th:alt="#{Logo}" /> <font></font>
+			</h1>
 		</div>
-		<div>
-			<label> 密 码 : <input type="password" name="password" />
-			</label>
+	</div>
+	<div class="l-main">
+		<div class="l-content l-width">
+			<div class="l-center-img">
+				<img th:src="@{/res/login/images/login-main.png}" />
+			</div>
+			<div class="l-form">
+				<div class="border-top">
+					<span></span>
+				</div>
+				<form id="loginForm" th:action="@{/login}" method="post">
+					<h3>会员登录</h3>
+					<div class="l-input">
+						<i class="fa fa-user">&nbsp;</i> <input type="text" id="username"
+							name="username" placeholder="用户名" maxlength="18" />
+					</div>
+					<div class="l-input">
+						<i class="fa fa-lock">&nbsp;</i> <input type="password"
+							id="password" name="password" placeholder="密码" maxlength="18" />
+					</div>
+<!-- 					<div class="l-verification">
+						<div class="l-input ">
+							<i class="fa fa-minus-square-o"></i> <input type="text"
+								name="validateCode" id="validateCode" placeholder="验证码" />
+						</div>
+
+						<div class="l-verifi-code">
+							                    <img class="mid validateCode" style="cursor: pointer;"  title="看不清?点击刷新" onclick="$('.validateCode').attr('src','/compute/validateCodeServlet?'+new Date().getTime());" th:src="/compute/validateCodeServlet?height=40&width=100" />
+						</div>
+					</div> -->
+
+					<div class="l-submit">
+<!-- 						<input type="submit" style="display: none" id="loginSub" />  -->
+<!-- 						<a class="btn-sub" id="btn_sub" onclick="form_sub()">登&nbsp;录</a>  -->
+							<input type="submit"  value="登录"/>
+							<label><input type="checkbox" name="remember" />记住密码</label>
+					</div>
+				</form>
+			</div>
 		</div>
-		<div>
-			<input type="submit" value="登录" />
-		</div>
-	</form>
+	</div>
+
+	<!-- 底部内容 -->
+	<!-- <div class="bottom"> -->
+	<!--     <p>© 版权所有2016 <br/> -->
+	<!--     <a th:href="$('.validateCode').attr('src','/compute/lg');" title="IE内核浏览器安装后可以直接使用，非IE内核，还需要安装浏览器插件。">网证通安全客户端V2.6.2</a></p>   -->
+	<!-- </div>  -->
+
 </body>
 </html>
