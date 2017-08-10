@@ -102,7 +102,7 @@ public class AuthServerApplication {
 		
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests().antMatchers("/images/**","/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
+			http.authorizeRequests().antMatchers("/res/**","/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
 		}
 	}
 	
