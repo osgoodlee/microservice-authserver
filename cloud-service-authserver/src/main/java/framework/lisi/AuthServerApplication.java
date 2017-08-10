@@ -102,7 +102,7 @@ public class AuthServerApplication {
 		
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
+			http.authorizeRequests().antMatchers("/images/**","/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
 		}
 	}
 	
@@ -148,10 +148,4 @@ public class AuthServerApplication {
 
 	}
 
-//	// @Autowired
-//	public void init(AuthenticationManagerBuilder auth) throws Exception {
-//		// @formatter:off
-//		auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder());
-//		// @formatter:on
-//	}
 }
